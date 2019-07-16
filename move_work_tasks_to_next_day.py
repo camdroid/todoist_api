@@ -42,12 +42,12 @@ tasks_due_before_work = [task for task in res
                        'due', {}).get('date'), '%Y-%m-%d') < next_work_day]
 
 for task in tasks_due_before_work:
-    print(f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}?')
-    pdb.set_trace()
+    response = input(f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}? [y/n]')
+    if response != 'y':
+        continue
     requests.post(BASE_URL+'tasks/'+str(task['id']),
         data=json.dumps({
             'due_date': next_work_day.strftime('%Y-%m-%d'),
         }),
         headers={**HEADERS, **{'Content-Type': 'application/json', 'X-Request-Id': str(uuid.uuid4())}}
     )
-pp.pprint(res)
