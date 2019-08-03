@@ -1,4 +1,5 @@
 import requests
+import argparse
 import pdb
 import json
 from secrets import API_TOKEN
@@ -13,6 +14,10 @@ BASE_URL = 'https://beta.todoist.com/API/v8/'
 HEADERS = {
    'Authorization': 'Bearer %s' % API_TOKEN
 }
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--recurring', action='store_true', default=False)
+args = parser.parse_args()
 
 # Stolen from https://stackoverflow.com/questions/9187215/datetime-python-next-business-day
 def next_business_day():
@@ -36,7 +41,7 @@ res = requests.get(BASE_URL+'tasks',
 
 next_work_day = next_business_day()
 tasks_due_before_work = [task for task in res
-                   if task.get('due', {}).get('recurring') == False
+                   if (args.recurring or task.get('due', {}).get('recurring') == False)
                    and task.get('due', {}).get('date')
                    and datetime.datetime.strptime(task.get(
                        'due', {}).get('date'), '%Y-%m-%d') < next_work_day]
