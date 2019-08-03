@@ -34,10 +34,9 @@ projects = requests.get(BASE_URL+'projects', headers=HEADERS).json()
 work_project_id = [project for project in projects if project['name'] == 'Work'][0]['id']
 
 res = requests.get(BASE_URL+'tasks',
-    params={'project_id': work_project_id},
-    headers={
-        'Authorization': 'Bearer %s' % API_TOKEN
-    }).json()
+        params={'project_id': work_project_id},
+        headers=HEADERS
+    ).json()
 
 next_work_day = next_business_day()
 tasks_due_before_work = [task for task in res
