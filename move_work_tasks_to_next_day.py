@@ -10,8 +10,7 @@ import uuid
 
 pp = pprint.PrettyPrinter()
 
-DEPRECATED_BASE_URL = 'https://beta.todoist.com/API/v8/'
-NEW_BASE_URL = 'https://api.todoist.com/rest/v1/'
+BASE_URL = 'https://api.todoist.com/rest/v1/'
 
 HEADERS = {
    'Authorization': 'Bearer %s' % API_TOKEN
@@ -32,13 +31,13 @@ def next_business_day():
     return next_day
  
 
-req = requests.get(NEW_BASE_URL+'projects', headers=HEADERS)
+req = requests.get(BASE_URL+'projects', headers=HEADERS)
 projects = []
 if req.status_code == 200:
     projects = req.json()
 work_project_id = [project for project in projects if project['name'] == 'Work'][0]['id']
 
-res = requests.get(NEW_BASE_URL+'tasks',
+res = requests.get(BASE_URL+'tasks',
         params={'project_id': work_project_id},
         headers=HEADERS
     ).json()
@@ -54,7 +53,7 @@ for task in tasks_due_before_work:
     response = input(f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}? [y/n]')
     if response != 'y':
         continue
-    res = requests.post(NEW_BASE_URL+'tasks/'+str(task['id']),
+    res = requests.post(BASE_URL+'tasks/'+str(task['id']),
         data=json.dumps({
             'due_date': next_work_day.strftime('%Y-%m-%d'),
         }),
