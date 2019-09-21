@@ -32,14 +32,13 @@ def next_business_day():
     return next_day
  
 
-req = requests.get(DEPRECATED_BASE_URL+'projects', headers=HEADERS)
+req = requests.get(NEW_BASE_URL+'projects', headers=HEADERS)
 projects = []
-pdb.set_trace()
 if req.status_code == 200:
     projects = req.json()
 work_project_id = [project for project in projects if project['name'] == 'Work'][0]['id']
 
-res = requests.get(DEPRECATED_BASE_URL+'tasks',
+res = requests.get(NEW_BASE_URL+'tasks',
         params={'project_id': work_project_id},
         headers=HEADERS
     ).json()
@@ -55,9 +54,14 @@ for task in tasks_due_before_work:
     response = input(f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}? [y/n]')
     if response != 'y':
         continue
-    requests.post(DEPRECATED_BASE_URL+'tasks/'+str(task['id']),
+    res = requests.post(NEW_BASE_URL+'tasks/'+str(task['id']),
         data=json.dumps({
             'due_date': next_work_day.strftime('%Y-%m-%d'),
         }),
         headers={**HEADERS, **{'Content-Type': 'application/json', 'X-Request-Id': str(uuid.uuid4())}}
     )
+    if res.status_code != 200:
+        # TODO debug why things end up here
+        pdb.set_trace()
+        print('Error: ')
+        print(res.content.decode('utf-8'))
