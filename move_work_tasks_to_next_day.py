@@ -18,6 +18,7 @@ HEADERS = {
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--recurring', action='store_true', default=False)
+parser.add_argument('--force-all', action='store_true', default=False)
 args = parser.parse_args()
 
 # Stolen from https://stackoverflow.com/questions/9187215/datetime-python-next-business-day
@@ -50,8 +51,12 @@ tasks_due_before_work = [task for task in res
                        'due', {}).get('date'), '%Y-%m-%d') < next_work_day]
 
 for task in tasks_due_before_work:
-    response = input(f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}? [y/n]')
-    if response != 'y':
+    output = f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}? [y/n]'
+    if args.force_all:
+        print(output+' y')
+    else:
+        response = input(f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}? [y/n]')
+    if args.force_all or response != 'y':
         continue
     res = requests.post(BASE_URL+'tasks/'+str(task['id']),
         data=json.dumps({
@@ -59,7 +64,7 @@ for task in tasks_due_before_work:
         }),
         headers={**HEADERS, **{'Content-Type': 'application/json', 'X-Request-Id': str(uuid.uuid4())}}
     )
-    if res.status_code != 200:
+    if res.status_code not in [200, 204]:
         # TODO debug why things end up here
         pdb.set_trace()
         print('Error: ')
