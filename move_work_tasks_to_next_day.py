@@ -55,8 +55,8 @@ for task in tasks_due_before_work:
     if args.force_all:
         print(output+' y')
     else:
-        response = input(f'Move {task["content"]} to {next_work_day.strftime("%Y-%m-%d")}? [y/n]')
-    if args.force_all or response != 'y':
+        response = input(output)
+    if not args.force_all and response != 'y':
         continue
     res = requests.post(BASE_URL+'tasks/'+str(task['id']),
         data=json.dumps({
