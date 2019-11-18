@@ -17,8 +17,8 @@ HEADERS = {
 }
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--recurring', action='store_true', default=False)
-parser.add_argument('--force-all', action='store_true', default=False)
+parser.add_argument('--recurring', '-r', action='store_true', default=False)
+parser.add_argument('--force-all', '-f', action='store_true', default=False)
 args = parser.parse_args()
 
 # Stolen from https://stackoverflow.com/questions/9187215/datetime-python-next-business-day
