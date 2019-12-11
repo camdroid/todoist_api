@@ -3,8 +3,8 @@ import plotly.figure_factory as ff
 import todoist
 from secrets import API_TOKEN
 import pprint
-import pdb
 import sys
+import pdb
 
 pprinter = pprint.PrettyPrinter()
 pp = pprinter.pprint
