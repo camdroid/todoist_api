@@ -19,6 +19,7 @@ HEADERS = {
 parser = argparse.ArgumentParser()
 parser.add_argument('--recurring', '-r', action='store_true', default=False)
 parser.add_argument('--force-all', '-f', action='store_true', default=False)
+parser.add_argument('--to', '-t')
 args = parser.parse_args()
 
 # Stolen from https://stackoverflow.com/questions/9187215/datetime-python-next-business-day
@@ -36,7 +37,7 @@ req = requests.get(BASE_URL+'projects', headers=HEADERS)
 projects = []
 if req.status_code == 200:
     projects = req.json()
-work_project_id = [project for project in projects if project['name'] == 'Work'][0]['id']
+work_project_id = [project for project in projects if 'Work' in project['name']][0]['id']
 
 res = requests.get(BASE_URL+'tasks',
         params={'project_id': work_project_id},
@@ -44,6 +45,14 @@ res = requests.get(BASE_URL+'tasks',
     ).json()
 
 next_work_day = next_business_day()
+if args.to:
+    date_array = args.to.split('-')
+    month = (int)(date_array[0])
+    day = (int)(date_array[1])
+    pdb.set_trace()
+    next_work_day = datetime.datetime.combine(datetime.datetime(year=2019, month=month, day=day), datetime.datetime.min.time())
+    # next_work_day = date
+
 tasks_due_before_work = [task for task in res
                    if (args.recurring or task.get('due', {}).get('recurring') == False)
                    and task.get('due', {}).get('date')
