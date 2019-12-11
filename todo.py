@@ -1,9 +1,10 @@
 import argparse
-import plotly.figure_factory as ff
 import todoist
 from secrets import API_TOKEN
 import pprint
 import sys
+import gantt
+import datetime
 import pdb
 
 pprinter = pprint.PrettyPrinter()
@@ -95,13 +96,30 @@ gantt_parser.add_argument('--toc', type=str)
 gantt_parser.set_defaults(func=parse_gantt_args)
 
 args = parser.parse_args()
-args.func(args)
+if 'func' in args:
+    args.func(args)
 
 
-df = [dict(Task="Job A", Start='2009-01-01', Finish='2009-02-28'),
-      dict(Task="Job B", Start='2009-03-05', Finish='2009-04-15'),
-      dict(Task="Job C", Start='2009-02-20', Finish='2009-05-30')]
+cam = gantt.Resource('Cam')
+landlord = gantt.Project(name='Landlord')
+send_task = gantt.Task(name='Send lease addendum',
+                  start=datetime.date(2019, 12,10),
+                  duration=4,
+                  resources=[cam])
+sign_task = gantt.Task(
+    name='Make sure lease addendum is signed',
+    start=datetime.date(2019, 12, 13),
+    duration=1,
+    resources=[cam],
+    depends_of=send_task,
+)
 
-# fig = ff.create_gantt(df)
-# fig.show()
-
+landlord.add_task(send_task)
+landlord.add_task(sign_task)
+# Have to open the SVG manually for now, will have to figure this out later
+landlord.make_svg_for_tasks(
+    filename='landlord_gantt_chart.svg',
+    today=datetime.datetime.today(),
+    start=datetime.date.today()-datetime.timedelta(days=7),
+    end=datetime.date.today()+datetime.timedelta(days=30),
+);
